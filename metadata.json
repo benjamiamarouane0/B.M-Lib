@@ -1,0 +1,5 @@
+{
+  "name": "B.M Lib",
+  "description": "An elegant web application to search and explore millions of books from the Open Library API. Discover new reads, view book details, and learn about authors in a beautifully designed interface.",
+  "requestFramePermissions": []
+}
