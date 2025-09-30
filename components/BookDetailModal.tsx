@@ -4,7 +4,7 @@ import { getCoverUrl, getAuthorDetails, getAuthorPhotoUrl, getReadability } from
 import CloseIcon from './icons/CloseIcon';
 import Spinner from './Spinner';
 import EyeIcon from './icons/EyeIcon';
-import { usePageMetadata, BaseMetadata } from '../hooks/usePageMetadata';
+import { usePageMetadata, setPageMetadata, BaseMetadata } from '../hooks/usePageMetadata';
 import SchemaInjector from './SchemaInjector';
 
 interface BookDetailModalProps {
@@ -20,18 +20,27 @@ const AuthorInfo: React.FC<{ authorId: string }> = ({ authorId }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const controller = new AbortController();
     const fetchAuthor = async () => {
       setLoading(true);
       try {
-        const authorDetails = await getAuthorDetails(authorId);
+        const authorDetails = await getAuthorDetails(authorId, controller.signal);
         setAuthor(authorDetails);
       } catch (error) {
-        console.error("Failed to fetch author", error);
+        if ((error as Error).name !== 'AbortError') {
+          console.error("Failed to fetch author", error);
+        }
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
     fetchAuthor();
+    
+    return () => {
+        controller.abort();
+    };
   }, [authorId]);
 
   if (loading) return <Spinner />;
@@ -108,8 +117,9 @@ const BookDetailModal: React.FC<BookDetailModalProps> = ({ bookDetails, bookSear
   // SEO: Revert metadata when modal closes
   useEffect(() => {
     return () => {
-      // This cleanup function runs on unmount
-      usePageMetadata(baseMetadata.view, {
+      // This cleanup function runs on unmount.
+      // Calling setPageMetadata directly avoids the "invalid hook call" error.
+      setPageMetadata(baseMetadata.view, {
         searchQuery: baseMetadata.searchQuery,
         subjectTitle: baseMetadata.subjectTitle
       });
@@ -118,6 +128,9 @@ const BookDetailModal: React.FC<BookDetailModalProps> = ({ bookDetails, bookSear
 
 
   useEffect(() => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+
     const fetchExtraData = async () => {
       if (!bookSearchResult) {
         setLoadingReadability(false);
@@ -136,9 +149,9 @@ const BookDetailModal: React.FC<BookDetailModalProps> = ({ bookDetails, bookSear
         let apiResponse: ReadApiResponse | null = null;
   
         if (olid) {
-          apiResponse = await getReadability('olid', olid);
+          apiResponse = await getReadability('olid', olid, signal);
         } else if (isbn) {
-          apiResponse = await getReadability('isbn', isbn);
+          apiResponse = await getReadability('isbn', isbn, signal);
         }
         
         if (apiResponse && apiResponse.items.length > 0) {
@@ -154,6 +167,10 @@ const BookDetailModal: React.FC<BookDetailModalProps> = ({ bookDetails, bookSear
           });
         }
       } catch (error) {
+        if ((error as Error).name === 'AbortError') {
+          return; // Request was cancelled, so we do nothing.
+        }
+
         console.error("Readability check API failed. Attempting IA fallback.", error);
         if (iaId) {
             setReadability({
@@ -168,11 +185,17 @@ const BookDetailModal: React.FC<BookDetailModalProps> = ({ bookDetails, bookSear
             setReadabilityError("Could not check book's online availability.");
         }
       } finally {
-          setLoadingReadability(false);
+          if (!signal.aborted) {
+            setLoadingReadability(false);
+          }
       }
     };
 
     fetchExtraData();
+
+    return () => {
+        controller.abort();
+    };
   }, [bookSearchResult, bookDetails.key]);
 
 

@@ -47,6 +47,7 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<View>('home');
+  const [refreshKey, setRefreshKey] = useState(0);
 
   usePageMetadata(view, { searchQuery, subjectTitle: selectedSubject?.title });
 
@@ -115,10 +116,34 @@ const App: React.FC = () => {
       displaySubject({ title: subject, subject, sort: 'editions' });
   }, [displaySubject]);
 
+  const refreshCurrentView = useCallback(() => {
+    switch (view) {
+      case 'search':
+        if (searchQuery) handleSearch(searchQuery, startYear, endYear);
+        break;
+      case 'subject':
+        if (selectedSubject) displaySubject(selectedSubject);
+        break;
+      case 'home':
+      case 'authors':
+        setRefreshKey(prev => prev + 1);
+        break;
+      default:
+        // No refresh needed for static pages like about, subjects list, etc.
+        break;
+    }
+  }, [view, searchQuery, startYear, endYear, selectedSubject, handleSearch, displaySubject]);
+
   const handleCloseModal = useCallback(() => {
     setSelectedBookDetails(null);
     setSelectedBookSearchResult(null);
-  }, []);
+    refreshCurrentView();
+  }, [refreshCurrentView]);
+
+  const handleCloseAuthorModal = useCallback(() => {
+    setSelectedAuthor(null);
+    refreshCurrentView();
+  }, [refreshCurrentView]);
 
   const resetToHome = () => {
     setSubjectBooks([]);
@@ -176,6 +201,7 @@ const App: React.FC = () => {
         case 'home':
             return (
                 <HomePage 
+                    key={`home-${refreshKey}`}
                     categories={CATEGORIES}
                     onSelectBook={handleSelectBook}
                     onShowAll={displaySubject}
@@ -186,7 +212,7 @@ const App: React.FC = () => {
         case 'subjects':
             return <SubjectsPage onSelectSubject={handleSelectSubject} />;
         case 'authors':
-            return <AuthorsPage onSelectAuthor={handleSelectAuthor} />;
+            return <AuthorsPage key={`authors-${refreshKey}`} onSelectAuthor={handleSelectAuthor} />;
         case 'about':
             return <AboutPage />;
         case 'terms':
@@ -299,7 +325,7 @@ const App: React.FC = () => {
       {selectedAuthor && (
         <AuthorDetailModal
             author={selectedAuthor}
-            onClose={() => setSelectedAuthor(null)}
+            onClose={handleCloseAuthorModal}
             baseMetadata={{ view, searchQuery, subjectTitle: selectedSubject?.title }}
         />
       )}

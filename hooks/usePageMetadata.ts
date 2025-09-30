@@ -75,17 +75,25 @@ const getPageMetadata = (view: View, options: MetadataOptions): { title: string;
     }
 };
 
-export const usePageMetadata = (view: View, options: Partial<MetadataOptions> = {}) => {
+// Standalone function to set metadata. This can be called from anywhere, including useEffect cleanup functions.
+export const setPageMetadata = (view: View, options: Partial<MetadataOptions> = {}) => {
     const { title, description } = getPageMetadata(view, options as MetadataOptions);
+    document.title = title;
+    const metaDescription = document.querySelector('meta[id="meta-description"]');
+    if (metaDescription) {
+        metaDescription.setAttribute('content', description);
+    }
+};
+
+
+export const usePageMetadata = (view: View, options: Partial<MetadataOptions> = {}) => {
+    // Stringify options to create a stable dependency for useEffect,
+    // preventing re-runs on every render if the options object is created inline.
+    const optionsKey = JSON.stringify(options);
 
     useEffect(() => {
-        document.title = title;
-        const metaDescription = document.querySelector('meta[id="meta-description"]');
-        if (metaDescription) {
-            metaDescription.setAttribute('content', description);
-        }
-    }, [title, description]);
+        setPageMetadata(view, options);
+    }, [view, optionsKey]);
 
-    // This static function is for the specific case of modal cleanup
     return;
 };

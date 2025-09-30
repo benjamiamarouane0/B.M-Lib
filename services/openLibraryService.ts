@@ -98,9 +98,9 @@ export const getBookDetails = async (workId: string): Promise<BookDetails | null
   }
 };
 
-export const getAuthorDetails = async (authorId: string): Promise<AuthorDetails | null> => {
+export const getAuthorDetails = async (authorId: string, signal?: AbortSignal): Promise<AuthorDetails | null> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/authors/${authorId}.json`);
+    const response = await fetch(`${API_BASE_URL}/authors/${authorId}.json`, { signal });
      if (!response.ok) {
       if (response.status === 404) {
         console.warn(`Author details not found for ${authorId}`);
@@ -111,7 +111,9 @@ export const getAuthorDetails = async (authorId: string): Promise<AuthorDetails 
     const data: AuthorDetails = await response.json();
     return data;
   } catch (error) {
-    console.error(`Failed to fetch author details for ${authorId}:`, error);
+    if ((error as Error).name !== 'AbortError') {
+      console.error(`Failed to fetch author details for ${authorId}:`, error);
+    }
     throw error;
   }
 }
@@ -254,10 +256,11 @@ export const searchInsideBook = async (
 // Open Library Read API
 export const getReadability = async (
   type: 'isbn' | 'lccn' | 'oclc' | 'olid',
-  value: string
+  value: string,
+  signal?: AbortSignal
 ): Promise<ReadApiResponse | null> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/volumes/brief/${type}/${value}.json`);
+    const response = await fetch(`${API_BASE_URL}/api/volumes/brief/${type}/${value}.json`, { signal });
     if (!response.ok) {
       if (response.status === 404) return null; // No record found is not an error
       throw new Error('Network response was not ok for Read API');
@@ -268,7 +271,9 @@ export const getReadability = async (
     }
     return data as ReadApiResponse;
   } catch (error) {
-    console.error(`Failed to fetch readability for ${type} ${value}:`, error);
+    if ((error as Error).name !== 'AbortError') {
+      console.error(`Failed to fetch readability for ${type} ${value}:`, error);
+    }
     throw error;
   }
 };

@@ -3,7 +3,7 @@ import { AuthorDetails, AuthorSearchResult, AuthorWork } from '../types';
 import { getAuthorDetails, getAuthorPhotoUrl, getAuthorWorks } from '../services/openLibraryService';
 import CloseIcon from './icons/CloseIcon';
 import Spinner from './Spinner';
-import { usePageMetadata, BaseMetadata } from '../hooks/usePageMetadata';
+import { usePageMetadata, setPageMetadata, BaseMetadata } from '../hooks/usePageMetadata';
 import SchemaInjector from './SchemaInjector';
 
 interface AuthorDetailModalProps {
@@ -28,8 +28,9 @@ const AuthorDetailModal: React.FC<AuthorDetailModalProps> = ({ author, onClose, 
   // SEO: Revert metadata when modal closes
   useEffect(() => {
     return () => {
-      // This cleanup function runs on unmount
-      usePageMetadata(baseMetadata.view, {
+      // This cleanup function runs on unmount.
+      // Calling setPageMetadata directly avoids the "invalid hook call" error.
+      setPageMetadata(baseMetadata.view, {
         searchQuery: baseMetadata.searchQuery,
         subjectTitle: baseMetadata.subjectTitle
       });
