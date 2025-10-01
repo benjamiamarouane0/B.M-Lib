@@ -15,10 +15,11 @@ import AuthorsPage from './components/AuthorsPage';
 import AboutPage from './components/AboutPage';
 import TermsPage from './components/TermsPage';
 import PrivacyPolicyPage from './components/PrivacyPolicyPage';
+import ContactPage from './components/ContactPage';
 import { usePageMetadata } from './hooks/usePageMetadata';
 import SchemaInjector from './components/SchemaInjector';
 
-type View = 'home' | 'subject' | 'search' | 'subjects' | 'authors' | 'about' | 'terms' | 'privacy';
+type View = 'home' | 'subject' | 'search' | 'subjects' | 'authors' | 'about' | 'terms' | 'privacy' | 'contact';
 type Category = { title: string; subject: string; sort: SortOrder };
 
 const CATEGORIES: Category[] = [
@@ -187,6 +188,11 @@ const App: React.FC = () => {
     setView('privacy');
   }, []);
 
+  const handleShowContact = useCallback(() => {
+    resetToHome();
+    setView('contact');
+  }, []);
+
 
   const renderMainContent = () => {
     if (error) {
@@ -219,6 +225,8 @@ const App: React.FC = () => {
             return <TermsPage />;
         case 'privacy':
             return <PrivacyPolicyPage />;
+        case 'contact':
+            return <ContactPage />;
         case 'search':
           return (
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -310,7 +318,7 @@ const App: React.FC = () => {
         {renderMainContent()}
       </main>
 
-      <Footer onShowTerms={handleShowTerms} onShowPrivacy={handleShowPrivacy} />
+      <Footer onShowTerms={handleShowTerms} onShowPrivacy={handleShowPrivacy} onShowContact={handleShowContact} />
       
       {selectedBookDetails && selectedBookSearchResult && (
         <BookDetailModal 

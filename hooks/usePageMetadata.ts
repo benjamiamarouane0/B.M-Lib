@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-type View = 'home' | 'subject' | 'search' | 'subjects' | 'authors' | 'about' | 'terms' | 'privacy' | 'book-details' | 'author-details';
+type View = 'home' | 'subject' | 'search' | 'subjects' | 'authors' | 'about' | 'terms' | 'privacy' | 'contact' | 'book-details' | 'author-details';
 
 export interface BaseMetadata {
     view: View;
@@ -46,6 +46,11 @@ const getPageMetadata = (view: View, options: MetadataOptions): { title: string;
             return {
                 title: `Privacy and Policy | ${siteName}`,
                 description: `Our commitment to your privacy. Read the privacy policy for the ${siteName} application.`,
+            };
+        case 'contact':
+            return {
+                title: `Reach Out | ${siteName}`,
+                description: `Get in touch with the team behind ${siteName}. We'd love to hear from you.`,
             };
         case 'search':
             return {
