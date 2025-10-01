@@ -24,9 +24,14 @@ const Hero: React.FC<HeroProps> = ({ onSearch, loading }) => {
           <h1 id="hero-heading" className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-tight text-yellow-300">
             Explore a Universe of Books
           </h1>
-          <p className="mt-6 max-w-2xl mx-auto text-lg sm:text-xl text-yellow-100">
-            Your gateway to the Open Library. Search for books, discover authors, and browse subjects.
-          </p>
+          <blockquote className="mt-6 max-w-2xl mx-auto">
+            <p className="text-xl sm:text-2xl font-serif italic text-yellow-100 leading-relaxed">
+              “The man who reads lives a thousand lives, but the man who does not read lives only one.”
+            </p>
+            <cite className="block mt-4 text-right text-lg text-yellow-200/80 not-italic">
+              — George R.R. Martin
+            </cite>
+          </blockquote>
           <div className="mt-8 max-w-2xl mx-auto">
             <SearchBar onSearch={onSearch} loading={loading} />
           </div>
