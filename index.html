@@ -17,72 +17,11 @@
 }
 </script>
     <style>
-      @keyframes float {
-        0% { transform: translateY(0px) rotate(0deg); }
-        50% { transform: translateY(-20px) rotate(3deg); }
-        100% { transform: translateY(0px) rotate(0deg); }
-      }
-
-      @keyframes drift {
-        0% { background-position: 0 0; }
-        100% { background-position: -100vw 50vh; }
-      }
-
       body {
-        position: relative;
         background-color: #032030; /* Dark blue fallback */
         background-image: linear-gradient(170deg, #032030 0%, #016056 100%); /* Blue to green gradient */
         background-attachment: fixed;
-        overflow-x: hidden; /* Prevents scrollbars from animations */
       }
-      
-      #root {
-        /* Create a new stacking context so the app is always above the pseudo-elements */
-        isolation: isolate;
-      }
-
-      /* Starfield layer */
-      body::before {
-        content: "";
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        z-index: -2;
-        background-image:
-          radial-gradient(1.5px 1.5px at 20% 30%, rgba(255,255,255,0.8), transparent),
-          radial-gradient(1px 1px at 80% 10%, rgba(255,255,255,0.7), transparent),
-          radial-gradient(1px 1px at 50% 70%, rgba(255,255,255,0.9), transparent),
-          radial-gradient(2px 2px at 90% 60%, rgba(255,255,255,0.6), transparent),
-          radial-gradient(1.5px 1.5px at 10% 90%, rgba(255,255,255,0.8), transparent),
-          radial-gradient(2.5px 2.5px at 40% 50%, rgba(255,255,255,0.7), transparent),
-          radial-gradient(2px 2px at 70% 80%, rgba(255,255,255,0.9), transparent),
-          radial-gradient(1px 1px at 5% 20%, rgba(255,255,255,0.6), transparent);
-        background-repeat: repeat;
-        background-size: 500px 500px;
-        animation: drift 200s infinite linear alternate;
-        opacity: 0.8;
-      }
-      
-      /* Butterflies layer */
-      body::after {
-        content: "";
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        z-index: -1;
-        background-image:
-          /* Large butterfly */
-          url('data:image/svg+xml,%3Csvg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M12 21C12 21 12.5 17 15 15.5C17.5 14 20 12 20 7C20 2 15 2 12 5C9 2 4 2 4 7C4 12 6.5 14 9 15.5C11.5 17 12 21 12 21Z" stroke="white" stroke-opacity="0.5" stroke-width="1" /%3E%3C/svg%3E'),
-          /* Medium butterfly */
-          url('data:image/svg+xml,%3Csvg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M12 21C12 21 12.5 17 15 15.5C17.5 14 20 12 20 7C20 2 15 2 12 5C9 2 4 2 4 7C4 12 6.5 14 9 15.5C11.5 17 12 21 12 21Z" stroke="white" stroke-opacity="0.7" stroke-width="1.2" /%3E%3C/svg%3E'),
-          /* Small butterfly */
-          url('data:image/svg+xml,%3Csvg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M12 21C12 21 12.5 17 15 15.5C17.5 14 20 12 20 7C20 2 15 2 12 5C9 2 4 2 4 7C4 12 6.5 14 9 15.5C11.5 17 12 21 12 21Z" stroke="white" stroke-opacity="0.6" stroke-width="1.5" /%3E%3C/svg%3E');
-        background-repeat: no-repeat;
-        background-size: 120px, 80px, 50px;
-        background-position: 20% 15%, 85% 70%, 10% 80%;
-        animation: float 15s infinite ease-in-out;
-        animation-delay: -2s;
-        filter: drop-shadow(0 0 10px rgba(180, 220, 255, 0.5));
-      }
-
     </style>
 </head>
   <body>
